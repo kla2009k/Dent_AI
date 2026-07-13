@@ -106,7 +106,8 @@ const I18N = {
 let lang = localStorage.getItem("ds_lang") || "th";
 let currentImage = null;
 let lastResult = null;
-let currentModality = "xray";          // "xray" | "photo" — set by modality switch
+let currentModality = "photo";         // "xray" | "photo" — real photo model is the public default
+let heatmapEnabled = true;
 
 // escape dynamic text ก่อนใส่ innerHTML (defense-in-depth)
 function esc(s) {
@@ -142,12 +143,16 @@ async function checkModel() {
   try {
     const r = await fetch(API + "/api/health");
     const d = await r.json();
-    if (d.model.mock) {
+    const track = currentModality === "photo" ? d.photo : d.xray;
+    const model = track?.model || d.model;
+    heatmapEnabled = model.heatmap_enabled !== false;
+    if (model.mock) {
       badge.className = "model-badge mock";
       status.textContent = lang === "th" ? "โหมด Demo (ยังไม่มี model)" : "Demo mode (no model)";
     } else {
       badge.className = "model-badge live";
-      const auc = d.model.mean_auc ? ` · AUC ${d.model.mean_auc.toFixed(2)}` : "";
+      const score = model.val_mean_auc ?? model.mean_auc;
+      const auc = score ? ` · AUC ${Number(score).toFixed(2)}` : "";
       status.textContent = (lang === "th" ? "AI พร้อม" : "AI ready") + auc;
     }
   } catch {
@@ -374,7 +379,7 @@ async function runAnalysis() {
   try {
     const r = await fetch(API + "/api/predict", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: currentImage, symptoms: getSymptoms(), heatmap: true, modality: currentModality }),
+      body: JSON.stringify({ image: currentImage, symptoms: getSymptoms(), heatmap: heatmapEnabled, modality: currentModality }),
     });
     const data = await r.json();
     lastResult = data;
@@ -807,6 +812,7 @@ function setModality(m) {
   const camRow = document.getElementById("camRow");
   if (camRow) camRow.hidden = !isPhoto;
   renderSamples();
+  checkModel();
 }
 
 function setupModality() {
@@ -864,9 +870,9 @@ function init() {
   renderSamples();
   setupUpload();
   setupModality();
+  setModality(currentModality);
   setupCamera();
   setupTheme();
-  checkModel();
   mountChat({ logId: "askLog", formId: "askForm", inputId: "askInput", quickId: "askQuick",
     quickSet: "general", getData: () => ({ predictions: {}, detected: [] }) });
 
