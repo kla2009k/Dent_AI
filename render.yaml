@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: dentscan-ai-nemophila
+    runtime: docker
+    plan: free
+    region: singapore
+    repo: https://github.com/kla2009k/Dent_AI
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: HF_MODEL_REPO_ID
+        value: NemophilaNah/DentScan-AI-Model
+      - key: HF_MODEL_FILENAME
+        value: best_model.pth
+      - key: HF_REVISION
+        value: e3c2db536a2f24b7bd8440ecf90760ad34e1f6da
+      - key: HF_TOKEN
+        sync: false

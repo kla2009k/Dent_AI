@@ -68,7 +68,7 @@ docker run --rm -p 7860:7860 --env-file .env dentscan-ai
 
 GitHub Pages ให้บริการได้เฉพาะไฟล์ static และไม่สามารถรัน FastAPI/PyTorch ได้ ดังนั้น repository นี้ใช้เก็บ source code และ CI ส่วน public AI demo ต้องนำ Docker image ไปวางบนบริการที่รองรับ Python backend และแนบ model checkpoint ที่มีสิทธิ์เผยแพร่แยกต่างหาก
 
-### Public demo บน Hugging Face Spaces
+### Public demo บน Hugging Face Spaces (บัญชี PRO)
 
 ใช้ Docker Space บน CPU basic และเก็บ checkpoint ใน private model repository:
 
@@ -83,6 +83,24 @@ GitHub Pages ให้บริการได้เฉพาะไฟล์ sta
 6. ไม่ต้องใส่ `GEMINI_API_KEY` หรือ `ANTHROPIC_API_KEY` ใน public demo; ระบบรายงานและแชตจะใช้ rule-based fallback เพื่อป้องกันการใช้โควตาจากบุคคลภายนอก
 
 เมื่อ Space เริ่มทำงาน ให้ตรวจ `GET /api/health` ว่า `photo.model.mock` เป็น `false` ก่อนแจก URL ให้กรรมการ
+
+### Public demo ฟรีบน Render
+
+บัญชี Hugging Face Free ยังใช้ private model repository ได้ แต่การสร้าง Docker
+Space บน CPU อาจต้องใช้ PRO โปรเจกต์นี้จึงมี `render.yaml` สำหรับสร้าง
+FastAPI + PyTorch เป็น Render Free Web Service โดยตรง:
+
+[Deploy to Render](https://render.com/deploy?repo=https://github.com/kla2009k/Dent_AI)
+
+1. กดลิงก์ด้านบน แล้วลงชื่อเข้า Render และเชื่อม GitHub
+2. ที่ช่องลับ `HF_TOKEN` ให้วาง Hugging Face fine-grained token ที่มีสิทธิอ่าน
+   `NemophilaNah/DentScan-AI-Model` เท่านั้น ห้ามใส่ token ใน source code
+3. กด **Apply** เพื่อสร้าง Web Service และรอ build ครั้งแรก
+4. เปิด URL `onrender.com` ที่ Render สร้าง แล้วตรวจ `/api/health` ว่า
+   `photo.model.mock` เป็น `false`
+
+Free Web Service จะพักเมื่อไม่มี request 15 นาที การเปิดครั้งแรกหลังพักอาจใช้เวลา
+ประมาณหนึ่งนาที แต่ URL เดิมยังคงใช้งานได้
 
 ถ้าเครื่องไม่มี `torch`/`timm`/`grad-cam` ระบบยังเปิดได้ใน mock mode เพื่ออัดเดโมและทดสอบ UI; เมื่อติดตั้ง dependency ครบจะโหลดโมเดลจริงจาก `models/serving_config.json`
 
