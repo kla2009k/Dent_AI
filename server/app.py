@@ -27,6 +27,7 @@ import llm_report
 ROOT = pathlib.Path(__file__).parent.parent
 WEB = ROOT / "web"
 MAX_IMAGE_BYTES = 12 * 1024 * 1024   # 12 MB
+MAX_IMAGE_B64_CHARS = (MAX_IMAGE_BYTES * 4 // 3) + 2048
 MAX_DIM = 6000                        # กันภาพใหญ่ผิดปกติ
 
 
@@ -53,6 +54,8 @@ class PredictRequest(BaseModel):
     def _check_image(cls, v):
         if not v or len(v) < 32:
             raise ValueError("image data empty/too small")
+        if len(v) > MAX_IMAGE_B64_CHARS:
+            raise ValueError("encoded image too large")
         return v
 
     @field_validator("modality")

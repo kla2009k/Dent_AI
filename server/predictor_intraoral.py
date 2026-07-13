@@ -20,6 +20,8 @@ from typing import Optional
 import numpy as np
 from PIL import Image
 
+from model_artifacts import ensure_model_file
+
 ROOT = pathlib.Path(__file__).parent.parent
 MODEL_PATH = ROOT / "models" / "intraoral" / "best_model.pth"
 
@@ -64,7 +66,13 @@ def _load():
                  "reason": reason}
         print(f"[predictor_intraoral] {reason} → MOCK mode")
 
-    if not MODEL_PATH.exists():
+    try:
+        resolved_model = ensure_model_file(MODEL_PATH)
+    except Exception as exc:
+        use_mock(f"model download unavailable ({type(exc).__name__})")
+        return
+
+    if resolved_model is None:
         use_mock("no model found")
         return
 

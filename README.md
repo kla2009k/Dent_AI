@@ -1,3 +1,14 @@
+---
+title: DentScan AI
+emoji: 🦷
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+license: other
+---
+
 # DentScan AI 🦷
 
 AI คัดกรองโรคฟันจาก panoramic X-ray (hybrid: X-ray + อาการ) สำหรับ **PCSHS Symposium 2026** (Oral Thai · สาขานวัตกรรม)
@@ -52,10 +63,26 @@ python -m uvicorn app:app --host 127.0.0.1 --port 8000
 
 ```powershell
 docker build -t dentscan-ai .
-docker run --rm -p 8000:8000 --env-file .env dentscan-ai
+docker run --rm -p 7860:7860 --env-file .env dentscan-ai
 ```
 
 GitHub Pages ให้บริการได้เฉพาะไฟล์ static และไม่สามารถรัน FastAPI/PyTorch ได้ ดังนั้น repository นี้ใช้เก็บ source code และ CI ส่วน public AI demo ต้องนำ Docker image ไปวางบนบริการที่รองรับ Python backend และแนบ model checkpoint ที่มีสิทธิ์เผยแพร่แยกต่างหาก
+
+### Public demo บน Hugging Face Spaces
+
+ใช้ Docker Space บน CPU basic และเก็บ checkpoint ใน private model repository:
+
+1. สร้าง private model repository แล้วอัปโหลด checkpoint เป็น `best_model.pth`
+2. สร้าง Space ใหม่ เลือก `Docker` และใช้ port `7860`
+3. push source code ชุดนี้ไปยัง Space repository
+4. ใน Space Settings เพิ่ม Variables:
+   - `HF_MODEL_REPO_ID=<username>/<private-model-repo>`
+   - `HF_MODEL_FILENAME=best_model.pth`
+   - `HF_REVISION=<commit-sha-or-tag>`
+5. เพิ่ม Secret ชื่อ `HF_TOKEN` โดยใช้ fine-grained token ที่อ่านได้เฉพาะ model repository
+6. ไม่ต้องใส่ `GEMINI_API_KEY` หรือ `ANTHROPIC_API_KEY` ใน public demo; ระบบรายงานและแชตจะใช้ rule-based fallback เพื่อป้องกันการใช้โควตาจากบุคคลภายนอก
+
+เมื่อ Space เริ่มทำงาน ให้ตรวจ `GET /api/health` ว่า `photo.model.mock` เป็น `false` ก่อนแจก URL ให้กรรมการ
 
 ถ้าเครื่องไม่มี `torch`/`timm`/`grad-cam` ระบบยังเปิดได้ใน mock mode เพื่ออัดเดโมและทดสอบ UI; เมื่อติดตั้ง dependency ครบจะโหลดโมเดลจริงจาก `models/serving_config.json`
 

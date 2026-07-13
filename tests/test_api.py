@@ -64,6 +64,13 @@ def test_predict_rejects_empty():
 
 
 @pytest.mark.skipif(not HAS_API, reason="fastapi/torch not available")
+def test_predict_rejects_oversized_encoded_image(monkeypatch):
+    monkeypatch.setattr(app_module, "MAX_IMAGE_B64_CHARS", 64)
+    r = client.post("/api/predict", json={"image": "a" * 65, "heatmap": False})
+    assert r.status_code == 422
+
+
+@pytest.mark.skipif(not HAS_API, reason="fastapi/torch not available")
 def test_report_endpoint_rule_based_fallback(monkeypatch):
     monkeypatch.setattr(app_module.llm_report, "_provider", lambda: None)
     payload = {
