@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --teal:#0ea5a4; --teal-d:#0a6e6d; --teal-l:#5eead4; --coral:#ff6b6b; --amber:#ffb547;
+  }
+  html,body{ width:1600px; height:1000px; font-family:'Prompt',sans-serif; overflow:hidden; }
+  .stage{
+    position:relative; width:1600px; height:1000px; color:#fff;
+    background:
+      radial-gradient(1200px 700px at 78% 12%, rgba(94,234,212,.30), transparent 60%),
+      radial-gradient(900px 600px at 10% 95%, rgba(255,107,107,.22), transparent 55%),
+      linear-gradient(135deg,#0a6e6d 0%, #0ea5a4 48%, #0b8281 100%);
+    overflow:hidden;
+  }
+  /* soft dotted texture */
+  .stage::before{
+    content:""; position:absolute; inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.10) 1.5px, transparent 1.6px);
+    background-size:34px 34px; opacity:.5; mask:linear-gradient(120deg,#000,transparent 70%);
+  }
+  .blob{ position:absolute; border-radius:50%; filter:blur(2px); }
+  .b1{ width:340px;height:340px; right:-90px; top:-110px; background:radial-gradient(circle,#5eead4,transparent 65%); opacity:.55;}
+  .b2{ width:260px;height:260px; left:-80px; bottom:-90px; background:radial-gradient(circle,#ff6b6b,transparent 65%); opacity:.40;}
+
+  /* ── LEFT ── */
+  .left{ position:absolute; left:88px; top:96px; width:760px; z-index:3; }
+  .brand{ display:flex; align-items:center; gap:16px; margin-bottom:46px; }
+  .logo{ width:74px;height:74px; border-radius:20px; display:grid; place-items:center; font-size:42px;
+    background:linear-gradient(135deg,#fff,#d9fbf6); box-shadow:0 12px 34px rgba(0,0,0,.25); }
+  .bname{ font-size:34px; font-weight:800; letter-spacing:-.5px; }
+  .bname .ac{ color:#ffd9d9; }
+  .bsub{ font-size:16px; font-weight:500; color:rgba(255,255,255,.82); letter-spacing:2px; }
+  h1{ font-size:78px; line-height:1.04; font-weight:800; letter-spacing:-1.5px; margin-bottom:26px;
+    text-shadow:0 6px 30px rgba(0,0,0,.18); }
+  h1 .hl{ background:linear-gradient(105deg,#fff 0%,#ffd9d9 55%,#ffb547 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .tag{ font-size:24px; font-weight:300; line-height:1.55; color:rgba(255,255,255,.92); max-width:660px; margin-bottom:40px; }
+  .pills{ display:flex; flex-wrap:wrap; gap:14px; max-width:680px; }
+  .pill{ display:flex; align-items:center; gap:9px; padding:13px 22px; border-radius:40px; font-size:18px; font-weight:500;
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(6px); }
+  .pill b{ font-weight:700; }
+
+  /* ── RIGHT app mockup ── */
+  .device{ position:absolute; right:90px; top:150px; width:560px; z-index:3; transform:rotate(2.5deg); }
+  .card{ background:#f4f8f8; border-radius:34px; padding:22px; box-shadow:0 40px 90px rgba(0,0,0,.40); }
+  .topbar{ display:flex; align-items:center; gap:8px; padding:4px 6px 16px; }
+  .dot{ width:13px;height:13px;border-radius:50%; }
+  .topttl{ margin-left:auto; font-size:15px; font-weight:600; color:#0a6e6d; }
+  .xraywrap{ position:relative; border-radius:20px; overflow:hidden; aspect-ratio:2.18/1; background:#0a1414; }
+  .xraywrap img{ width:100%; height:100%; object-fit:cover; filter:contrast(1.08) brightness(1.05); }
+  .heat{ position:absolute; border-radius:50%; mix-blend-mode:screen; filter:blur(7px); }
+  .h1{ width:150px;height:150px; left:30%; top:34%;
+    background:radial-gradient(circle,rgba(255,40,40,.9),rgba(255,170,0,.5) 45%,transparent 70%); }
+  .h2{ width:104px;height:104px; left:62%; top:30%;
+    background:radial-gradient(circle,rgba(255,120,0,.8),transparent 70%); }
+  .scan{ position:absolute; left:0; right:0; top:42%; height:3px; background:linear-gradient(90deg,transparent,#5eead4,transparent); box-shadow:0 0 14px #5eead4; }
+  .badge{ position:absolute; left:14px; top:14px; background:rgba(10,110,109,.92); color:#fff; font-size:13px; font-weight:600;
+    padding:6px 12px; border-radius:20px; display:flex; align-items:center; gap:6px; }
+  .badge i{ width:8px;height:8px;border-radius:50%; background:#5eead4; box-shadow:0 0 8px #5eead4; }
+
+  .res{ display:flex; gap:16px; margin-top:18px; align-items:center; }
+  .gauge{ width:120px;height:120px; border-radius:50%; flex-shrink:0;
+    background:conic-gradient(#ff6b6b 0 69%, #e3eded 69% 100%);
+    display:grid; place-items:center; position:relative; }
+  .gauge::after{ content:""; position:absolute; width:84px;height:84px;border-radius:50%; background:#f4f8f8; }
+  .gtxt{ position:relative; z-index:2; text-align:center; }
+  .gtxt b{ display:block; font-size:30px; font-weight:800; color:#122524; line-height:1; }
+  .gtxt span{ font-size:12px; color:#ff6b6b; font-weight:600; }
+  .bars{ flex:1; display:flex; flex-direction:column; gap:11px; }
+  .bar{ }
+  .bar .bl{ display:flex; justify-content:space-between; font-size:13px; color:#3a5453; margin-bottom:5px; font-weight:500; }
+  .bar .track{ height:10px; background:#e3eded; border-radius:6px; overflow:hidden; }
+  .bar .fill{ height:100%; border-radius:6px; }
+
+  /* footer */
+  .foot{ position:absolute; left:90px; bottom:54px; z-index:3; display:flex; align-items:center; gap:18px; }
+  .foot .fl{ font-size:17px; color:rgba(255,255,255,.9); font-weight:500; }
+  .foot .sep{ width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5); }
+  .disc{ position:absolute; right:96px; bottom:56px; z-index:3; font-size:14px; color:rgba(255,255,255,.7); font-weight:300; }
+  .teeth{ position:absolute; right:60px; bottom:-30px; font-size:200px; opacity:.06; z-index:1; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="teeth">🦷</div>
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="brand">
+      <div class="logo">🦷</div>
+      <div>
+        <div class="bname">DentScan<span class="ac">AI</span></div>
+        <div class="bsub">DENTAL SCREENING AI</div>
+      </div>
+    </div>
+    <h1>คัดกรองโรคฟัน<br><span class="hl">ด้วยปัญญาประดิษฐ์</span></h1>
+    <div class="tag">วิเคราะห์ภาพรังสีพาโนรามิก ตรวจหา 4 โรคฟันหลัก<br>พร้อมระบุตำแหน่งด้วย Grad-CAM และรายงานภาษาไทย</div>
+    <div class="pills">
+      <div class="pill">🦷 <b>4</b> โรคที่ตรวจ</div>
+      <div class="pill">🔥 Grad-CAM อธิบายผล</div>
+      <div class="pill">🧠 Ensemble AI</div>
+      <div class="pill">📝 รายงานภาษาไทย</div>
+    </div>
+  </div>
+
+  <!-- RIGHT mockup -->
+  <div class="device">
+    <div class="card">
+      <div class="topbar">
+        <span class="dot" style="background:#ff6b6b"></span>
+        <span class="dot" style="background:#ffb547"></span>
+        <span class="dot" style="background:#0ea5a4"></span>
+        <span class="topttl">ผลการวิเคราะห์</span>
+      </div>
+      <div class="xraywrap">
+        <img src="web/samples/sample1.png" alt="xray">
+        <div class="badge"><i></i> AI วิเคราะห์</div>
+        <div class="heat h1"></div>
+        <div class="heat h2"></div>
+        <div class="scan"></div>
+      </div>
+      <div class="res">
+        <div class="gauge"><div class="gtxt"><b>69%</b><span>ความเสี่ยงสูง</span></div></div>
+        <div class="bars">
+          <div class="bar"><div class="bl"><span>🦷 ฟันผุ</span><span>72%</span></div><div class="track"><div class="fill" style="width:72%;background:#2196F3"></div></div></div>
+          <div class="bar"><div class="bl"><span>🟣 รอยโรคปลายราก</span><span>56%</span></div><div class="track"><div class="fill" style="width:56%;background:#E91E63"></div></div></div>
+          <div class="bar"><div class="bl"><span>🦿 ฟันคุด</span><span>92%</span></div><div class="track"><div class="fill" style="width:92%;background:#8b5cf6"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="fl">EfficientNet Ensemble</span><span class="sep"></span>
+    <span class="fl">DENTEX 2023</span><span class="sep"></span>
+    <span class="fl">PCSHS Symposium 2026</span>
+  </div>
+  <div class="disc">⚠️ เครื่องมือคัดกรองเบื้องต้น — ไม่ใช่การวินิจฉัยทางการแพทย์</div>
+</div>
+</body>
+</html>

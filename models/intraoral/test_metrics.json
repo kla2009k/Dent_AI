@@ -1,0 +1,39 @@
+{
+  "n_test": 991,
+  "per_class": {
+    "Caries": {
+      "auc": 0.9744,
+      "ap": 0.9493,
+      "f1": 0.8674,
+      "tp": 193,
+      "fp": 26,
+      "tn": 739,
+      "fn": 33,
+      "sensitivity": 0.854,
+      "specificity": 0.966
+    },
+    "Gingivitis": {
+      "auc": 0.9832,
+      "ap": 0.9467,
+      "f1": 0.8554,
+      "tp": 216,
+      "fp": 55,
+      "tn": 702,
+      "fn": 18,
+      "sensitivity": 0.9231,
+      "specificity": 0.9273
+    },
+    "Calculus": {
+      "auc": 0.9751,
+      "ap": 0.851,
+      "f1": 0.753,
+      "tp": 125,
+      "fp": 78,
+      "tn": 784,
+      "fn": 4,
+      "sensitivity": 0.969,
+      "specificity": 0.9095
+    }
+  },
+  "mean_auc": 0.9776
+}

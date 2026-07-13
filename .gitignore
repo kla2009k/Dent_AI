@@ -1,0 +1,52 @@
+# Data (large, redistribute under DENTEX license — ห้าม commit)
+dentex_data/
+intraoral_data/
+data/
+
+# Model weights (ใหญ่ — ใช้ Git LFS หรือแยกเก็บ)
+*.pth
+models/**/*.pth
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Server logs / temp
+server/*.log
+scripts/*.log
+tmp/
+output/
+**/_heatmap_test.png
+**/_home_shot.png
+**/_*_shot.png
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Keep these (override): metrics, charts, config
+!models/**/metrics.json
+!models/serving_config.json
+!models/**/training_curve.png
+
+# Secrets — API keys (DO NOT commit)
+.env
+*.env
+!.env.example
+
+# Local IDE / generated documents
+.vscode/
+.idea/
+*.docx
+PRJ68-CS02.pdf
+report/DentScan_Report.pdf
+
+# Local agent/design briefs
+CLAUDE.md
+IMPECCABLE_BRIEF.md

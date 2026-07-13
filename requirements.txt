@@ -1,0 +1,27 @@
+# DentScan AI — Phase 1 dependencies
+# torch/torchvision ลงแยก (ต้อง CUDA 12.8 index สำหรับ RTX 5060 Blackwell):
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+
+# data + EDA
+huggingface_hub
+pandas
+numpy
+matplotlib
+seaborn
+pillow
+tqdm
+
+# training
+timm
+scikit-learn
+albumentations
+grad-cam            # pytorch-grad-cam (import: pytorch_grad_cam)
+
+# Phase 2 (web/API)
+fastapi
+uvicorn[standard]
+python-multipart
+
+# tests
+pytest
+httpx

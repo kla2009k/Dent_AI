@@ -1,0 +1,23 @@
+{
+  "mode": "ensemble",
+  "models": [
+    "models\\best_model.pth",
+    "models\\v2\\best_model.pth"
+  ],
+  "tta_hflip": true,
+  "thresholds": {
+    "Caries": 0.35,
+    "Deep Caries": 0.3,
+    "Periapical Lesion": 0.3,
+    "Impacted": 0.45
+  },
+  "diseases": [
+    "Caries",
+    "Deep Caries",
+    "Periapical Lesion",
+    "Impacted"
+  ],
+  "val_mean_auc": 0.7229,
+  "best_config_name": "ens(v1,v2)+tta",
+  "note": "thresholds จูนบน DENTEX val (50 ภาพ) — เล็ก ต้อง disclose ในเล่ม; ensemble+TTA = robust ไม่ overfit threshold"
+}

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DentScan AI — คัดกรองโรคฟันจากภาพ X-ray และภาพถ่าย</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦷</text></svg>">
+</head>
+<body>
+
+<!-- ░░ Sidebar ░░ -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-logo">🦷</div>
+    <div class="brand-text">
+      <span class="brand-name">DentScan<span class="accent">AI</span></span>
+      <span class="brand-sub" data-i18n="brandSub">คัดกรองโรคฟัน</span>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-item active" data-page="home">
+      <span class="nav-ico">🏠</span><span data-i18n="navHome">หน้าหลัก</span>
+    </button>
+    <button class="nav-item" data-page="analyze">
+      <span class="nav-ico">🔬</span><span data-i18n="navAnalyze">วิเคราะห์ภาพ</span>
+    </button>
+    <button class="nav-item" data-page="result" id="navResult" disabled>
+      <span class="nav-ico">📋</span><span data-i18n="navResult">ผลวิเคราะห์</span>
+    </button>
+    <button class="nav-item" data-page="history">
+      <span class="nav-ico">🕑</span><span data-i18n="navHistory">ประวัติ</span>
+    </button>
+    <button class="nav-item" data-page="info">
+      <span class="nav-ico">📚</span><span data-i18n="navInfo">ความรู้โรคฟัน</span>
+    </button>
+    <button class="nav-item" data-page="ask">
+      <span class="nav-ico">💬</span><span data-i18n="navAsk">ปรึกษา AI</span>
+    </button>
+    <button class="nav-item" data-page="about">
+      <span class="nav-ico">ℹ️</span><span data-i18n="navAbout">เกี่ยวกับโปรเจค</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-foot">
+    <div class="model-badge" id="modelBadge">
+      <span class="dot"></span><span id="modelStatus" data-i18n="modelChecking">กำลังเชื่อมต่อ…</span>
+    </div>
+    <div class="foot-controls">
+      <button class="ctl-btn" id="themeToggle" title="สลับธีม">🌙</button>
+      <button class="ctl-btn" id="langToggle" title="EN/TH">EN</button>
+    </div>
+  </div>
+</aside>
+
+<button class="menu-fab" id="menuFab">☰</button>
+
+<!-- ░░ Main ░░ -->
+<main class="main" id="main">
+
+  <!-- ── HOME ── -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-text">
+        <h1 data-i18n="heroTitle">วิเคราะห์สุขภาพฟันจากภาพ X-ray ด้วย AI</h1>
+        <p data-i18n="heroSub">อัปโหลดภาพ X-ray พาโนรามิก + กรอกอาการ → ระบบ AI ตรวจหา 4 โรคฟันหลัก พร้อมแผนที่ความร้อน (heatmap) ชี้ตำแหน่ง และรายงานภาษาไทย</p>
+        <button class="btn-primary" data-page="analyze" data-i18n="heroCta">เริ่มวิเคราะห์ →</button>
+        <p class="disclaimer-sm" data-i18n="heroDisc">⚠️ เครื่องมือช่วยคัดกรองเบื้องต้น — ไม่ใช่การวินิจฉัยทางการแพทย์ ควรพบทันตแพทย์เพื่อยืนยัน</p>
+      </div>
+      <div class="hero-card">
+        <div class="hero-xray">
+          <div class="scan-line"></div>
+          <span class="hero-tooth">🦷</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><span class="stat-num">6</span><span class="stat-lbl" data-i18n="statDiseases">โรคที่ตรวจ</span></div>
+      <div class="stat-card"><span class="stat-num">AI</span><span class="stat-lbl" data-i18n="statXai">อธิบายได้ (Grad-CAM)</span></div>
+      <div class="stat-card"><span class="stat-num">2</span><span class="stat-lbl" data-i18n="statHybrid">ข้อมูล: ภาพ+อาการ</span></div>
+      <div class="stat-card"><span class="stat-num">TH</span><span class="stat-lbl" data-i18n="statReport">รายงานภาษาไทย</span></div>
+    </div>
+
+    <h2 class="section-title" data-i18n="diseaseListTitle">โรคที่ระบบตรวจหา</h2>
+    <div class="disease-grid" id="homeDiseaseGrid"></div>
+  </section>
+
+  <!-- ── ANALYZE ── -->
+  <section class="page" id="page-analyze">
+    <h2 class="page-title" data-i18n="analyzeTitle">วิเคราะห์ภาพ X-ray</h2>
+
+    <!-- modality selector: panoramic X-ray vs intraoral photo -->
+    <div class="modality-switch" id="modalitySwitch" role="tablist">
+      <button class="mod-btn active" data-modality="xray" role="tab" aria-selected="true">
+        <span class="mod-ico">🩻</span>
+        <span class="mod-txt"><b data-i18n="modXray">ภาพ X-ray พาโนรามิก</b><small data-i18n="modXraySub">ฟิล์มรังสีทั้งปาก · 4 โรค</small></span>
+      </button>
+      <button class="mod-btn" data-modality="photo" role="tab" aria-selected="false">
+        <span class="mod-ico">📷</span>
+        <span class="mod-txt"><b data-i18n="modPhoto">ภาพถ่ายฟัน</b><small data-i18n="modPhotoSub">ถ่ายด้วยมือถือ · ฟันผุ</small></span>
+      </button>
+    </div>
+
+    <div class="analyze-layout">
+      <!-- upload -->
+      <div class="card upload-card">
+        <h3 data-i18n="step1">1. อัปโหลดภาพ X-ray พาโนรามิก</h3>
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="fileInput" accept="image/*" hidden>
+          <div class="dz-empty" id="dzEmpty">
+            <span class="dz-ico">📤</span>
+            <p data-i18n="dropText">ลากภาพมาวาง หรือคลิกเพื่อเลือก</p>
+            <span class="dz-hint">PNG / JPG · panoramic X-ray</span>
+          </div>
+          <img id="preview" class="dz-preview" hidden alt="preview">
+        </div>
+
+        <!-- live camera capture (phone/webcam) — for intraoral photos -->
+        <div class="cam-row" id="camRow" hidden>
+          <button class="btn-cam" id="camBtn" type="button">📷 <span data-i18n="camBtn">ถ่ายด้วยกล้อง (สแกนสด)</span></button>
+        </div>
+        <div class="cam-stage" id="camStage" hidden>
+          <video id="camVideo" playsinline autoplay muted></video>
+          <div class="cam-controls">
+            <button class="btn-primary" id="camShot" type="button">📸 <span data-i18n="camShot">ถ่าย</span></button>
+            <button class="btn-ghost" id="camCancel" type="button">✕ <span data-i18n="camCancel">ยกเลิก</span></button>
+          </div>
+        </div>
+        <canvas id="camCanvas" hidden></canvas>
+
+        <div class="sample-row">
+          <span data-i18n="orSample">หรือลองภาพตัวอย่าง:</span>
+          <div id="sampleThumbs" class="sample-thumbs"></div>
+        </div>
+      </div>
+
+      <!-- symptom form -->
+      <div class="card symptom-card">
+        <h3 data-i18n="step2">2. อาการ (เพิ่มความแม่นยำ)</h3>
+        <p class="muted-sm" data-i18n="symptomHint">ระบบรวมข้อมูลภาพ + อาการ (hybrid) เพื่อปรับผลให้แม่นขึ้น</p>
+        <div class="symptom-list">
+          <label class="sw"><input type="checkbox" id="sym_visible_hole"><span class="sw-track"></span><span data-i18n="symHole">เห็นรู/จุดดำบนฟัน</span></label>
+          <label class="sw"><input type="checkbox" id="sym_sensitive_hot_cold"><span class="sw-track"></span><span data-i18n="symSens">เสียวฟันเวลาร้อน/เย็น</span></label>
+          <label class="sw"><input type="checkbox" id="sym_pain_chew"><span class="sw-track"></span><span data-i18n="symChew">ปวดเวลาเคี้ยว/กัด</span></label>
+          <label class="sw"><input type="checkbox" id="sym_spontaneous_pain"><span class="sw-track"></span><span data-i18n="symSpont">ปวดเองโดยไม่กระตุ้น</span></label>
+          <label class="sw"><input type="checkbox" id="sym_gum_swelling"><span class="sw-track"></span><span data-i18n="symGum">เหงือกบวม/มีหนอง</span></label>
+        </div>
+        <div class="dur-row">
+          <span data-i18n="symDur">ระยะเวลาที่มีอาการ:</span>
+          <select id="sym_duration">
+            <option value="0" data-i18n="durNone">ไม่มีอาการ</option>
+            <option value="3" data-i18n="durFew">2-3 วัน</option>
+            <option value="7" data-i18n="durWeek">~1 สัปดาห์</option>
+            <option value="14" data-i18n="durLong">มากกว่า 2 สัปดาห์</option>
+          </select>
+        </div>
+        <button class="btn-primary full" id="analyzeBtn" disabled data-i18n="analyzeBtn">วิเคราะห์ด้วย AI</button>
+      </div>
+    </div>
+
+    <!-- processing overlay -->
+    <div class="processing" id="processing" hidden>
+      <div class="proc-ring"></div>
+      <p id="procText" data-i18n="procText">กำลังประมวลผล…</p>
+      <div class="proc-steps" id="procSteps"></div>
+    </div>
+  </section>
+
+  <!-- ── RESULT ── -->
+  <section class="page" id="page-result">
+    <h2 class="page-title" data-i18n="resultTitle">ผลการวิเคราะห์</h2>
+    <div id="resultContent"></div>
+  </section>
+
+  <!-- ── HISTORY ── -->
+  <section class="page" id="page-history">
+    <h2 class="page-title" data-i18n="historyTitle">ประวัติการวิเคราะห์</h2>
+    <div id="historyContent" class="history-grid"></div>
+  </section>
+
+  <!-- ── INFO ── -->
+  <section class="page" id="page-info">
+    <h2 class="page-title" data-i18n="infoTitle">ความรู้เกี่ยวกับโรคฟัน</h2>
+    <div id="infoContent"></div>
+  </section>
+
+  <!-- ── ASK AI (standalone chat) ── -->
+  <section class="page" id="page-ask">
+    <h2 class="page-title" data-i18n="askTitle">ปรึกษาทันตกรรมกับ AI</h2>
+    <p class="page-sub" data-i18n="askSub">ถามได้ทุกเรื่องสุขภาพฟัน — อาการปวดฟัน ฟันคุด การดูแล การเตรียมตัวก่อนพบทันตแพทย์</p>
+    <div class="ask-wrap card">
+      <div class="chat-log tall" id="askLog">
+        <div class="chat-msg ai"><span class="chat-av">🦷</span><div class="chat-bub" data-i18n="askGreet">สวัสดี! ผมคือผู้ช่วยทันตกรรม DentScan AI ถามเรื่องฟันได้เลย เช่น “ปวดฟันกลางคืนทำไงดี”</div></div>
+      </div>
+      <div class="chat-quick" id="askQuick"></div>
+      <form class="chat-form" id="askForm">
+        <input type="text" id="askInput" autocomplete="off" placeholder="พิมพ์คำถามเรื่องฟัน…">
+        <button type="submit" class="btn-primary chat-send">➤</button>
+      </form>
+      <p class="ask-disc" data-i18n="askDisc">⚠️ คำแนะนำเบื้องต้นด้วย AI — ไม่ใช่การวินิจฉัย ควรพบทันตแพทย์เพื่อตรวจจริง</p>
+    </div>
+  </section>
+
+  <!-- ── ABOUT (project dashboard) ── -->
+  <section class="page" id="page-about">
+    <div id="aboutContent"></div>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
