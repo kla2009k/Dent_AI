@@ -9,7 +9,8 @@ WORKDIR /app
 COPY requirements-runtime.txt .
 RUN pip install --no-cache-dir \
       torch torchvision --index-url https://download.pytorch.org/whl/cpu \
-    && pip install --no-cache-dir -r requirements-runtime.txt
+    && pip install --no-cache-dir -r requirements-runtime.txt \
+    && pip install --no-cache-dir --no-deps grad-cam==1.5.5
 
 COPY server ./server
 COPY web ./web
