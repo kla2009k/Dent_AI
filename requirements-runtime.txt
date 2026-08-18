@@ -1,15 +1,7 @@
-# Production inference only. Training, notebooks, charts, and tests stay in
-# requirements.txt / requirements-ci.txt and are intentionally omitted here.
-huggingface_hub>=0.30,<2
+# Production inference only. Training and PyTorch stay in requirements.txt.
 numpy>=1.26,<3
+onnxruntime>=1.20,<2
 pillow>=10,<13
-timm>=1.0,<2
-albumentations>=2.0,<3
-opencv-python-headless>=4.10,<5
-matplotlib>=3.9,<4
-scikit-learn>=1.5,<2
-ttach==0.0.3
-tqdm>=4.66,<5
 fastapi>=0.115,<1
 uvicorn[standard]>=0.34,<1
 python-multipart>=0.0.20,<1

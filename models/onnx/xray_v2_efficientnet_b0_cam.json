@@ -1,0 +1,14 @@
+{
+  "backbone": "efficientnet_b0",
+  "diseases": [
+    "Caries",
+    "Deep Caries",
+    "Periapical Lesion",
+    "Impacted"
+  ],
+  "width": 640,
+  "height": 320,
+  "val_mean_auc": 0.6687,
+  "target_layer": "conv_head",
+  "attribution_method": "class_activation_mapping"
+}

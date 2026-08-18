@@ -55,7 +55,7 @@ const I18N = {
     heroSub: "เลือกได้ 2 แบบ: ภาพ X-ray พาโนรามิก (ตรวจ 4 โรค) หรือ ถ่ายฟันสีด้วยมือถือสดๆ (ผุ/เหงือกอักเสบ/หินปูน) → AI ชี้ตำแหน่งด้วย heatmap + รายงานภาษาไทย",
     heroCta: "เริ่มวิเคราะห์ →",
     heroDisc: "⚠️ เครื่องมือช่วยคัดกรองเบื้องต้น — ไม่ใช่การวินิจฉัยทางการแพทย์ ควรพบทันตแพทย์เพื่อยืนยัน",
-    statDiseases: "โรคที่ตรวจ", statXai: "อธิบายได้ (Grad-CAM)", statHybrid: "ข้อมูล: ภาพ+อาการ", statReport: "รายงานภาษาไทย",
+    statDiseases: "โรคที่ตรวจ", statXai: "อธิบายได้ (CAM)", statHybrid: "ข้อมูล: ภาพ+อาการ", statReport: "รายงานภาษาไทย",
     diseaseListTitle: "โรคที่ระบบตรวจหา",
     analyzeTitle: "วิเคราะห์ภาพ X-ray", step1: "1. อัปโหลดภาพ X-ray พาโนรามิก",
     modXray: "ภาพ X-ray พาโนรามิก", modXraySub: "ฟิล์มรังสีทั้งปาก · 4 โรค",
@@ -82,7 +82,7 @@ const I18N = {
     heroSub: "Two ways: panoramic X-ray (4 diseases) or a live color phone photo (caries) → AI localizes with a heatmap + a readable Thai report.",
     heroCta: "Start Analysis →",
     heroDisc: "⚠️ Preliminary screening tool — not a medical diagnosis. Consult a dentist to confirm.",
-    statDiseases: "Diseases", statXai: "Explainable (Grad-CAM)", statHybrid: "Image + Symptoms", statReport: "Thai Report",
+    statDiseases: "Diseases", statXai: "Explainable (CAM)", statHybrid: "Image + Symptoms", statReport: "Thai Report",
     diseaseListTitle: "Diseases Detected",
     analyzeTitle: "Analyze X-ray", step1: "1. Upload panoramic X-ray",
     modXray: "Panoramic X-ray", modXraySub: "Full-mouth radiograph · 4 diseases",
@@ -200,11 +200,11 @@ const PIPELINE = [
   { ico: "📤", th: "รับภาพ 2 แบบ", en: "Dual input", d_th: "อัปโหลด/ถ่ายสด — ภาพ X-ray พาโนรามิก หรือ ภาพถ่ายฟันสี (มือถือ)", d_en: "Upload or live-capture — panoramic X-ray or color intraoral photo" },
   { ico: "🧭", th: "เลือก modality", en: "Route by modality", d_th: "ระบบส่งเข้าโมเดลที่เหมาะกับชนิดภาพ (X-ray ↔ photo)", d_en: "Routes to the model matching the image type" },
   { ico: "🧠", th: "ตรวจด้วย AI", en: "AI inference", d_th: "EfficientNet-B0 — X-ray 4 โรค (multi-label) · photo ตรวจฟันผุ", d_en: "EfficientNet-B0 — X-ray 4 diseases · photo caries" },
-  { ico: "🔥", th: "อธิบายผล", en: "Explain", d_th: "Grad-CAM heatmap ซ้อนบนภาพ ชี้ตำแหน่งที่ AI สนใจ (ปรับความเข้มได้)", d_en: "Grad-CAM overlay on the image, adjustable opacity" },
+  { ico: "🔥", th: "อธิบายผล", en: "Explain", d_th: "CAM heatmap ซ้อนบนภาพ ชี้บริเวณที่มีอิทธิพลต่อคะแนน AI (ปรับความเข้มได้)", d_en: "CAM attribution overlay on the image with adjustable opacity" },
   { ico: "🔗", th: "รวมอาการ", en: "Fuse symptoms", d_th: "ปรับผลตามอาการที่ผู้ใช้กรอก (hybrid fusion)", d_en: "Adjust by reported symptoms" },
   { ico: "📝", th: "สร้างรายงาน", en: "Report", d_th: "LLM เขียนรายงานไทย 2 ระดับ (คนไข้/ทันตแพทย์) + แชทถาม-ตอบ", d_en: "LLM Thai report (patient/clinician) + chat" },
 ];
-const TECH = ["PyTorch", "EfficientNet-B0 (timm)", "Grad-CAM", "Focal Loss", "FastAPI", "Chart.js", "DENTEX 2023", "Zenodo intraoral (CC BY)"];
+const TECH = ["ONNX Runtime", "EfficientNet-B0", "Class Activation Mapping", "Focal Loss", "FastAPI", "Chart.js", "DENTEX 2023", "Zenodo intraoral (CC BY)"];
 // intraoral photo track — per-disease AUC on held-out TEST set (3-class)
 const METRICS = [
   { dis: "Caries", th: "ฟันผุ", auc: 0.974, color: "#2196F3" },
@@ -230,7 +230,7 @@ function renderAbout() {
     <div class="about-hero reveal">
       <div class="ah-badge">🦷 DentScan AI</div>
       <h1>${T ? "คัดกรองโรคฟันด้วย AI — จาก X-ray และภาพถ่ายฟันสี" : "AI Dental Screening — from X-rays and color photos"}</h1>
-      <p>${T ? "รองรับ 2 แบบภาพ: X-ray พาโนรามิก (4 โรค) และ ภาพถ่ายฟันสีจากมือถือ ถ่ายสดตรวจ ฟันผุ/เหงือกอักเสบ/หินปูน + ฟันปกติ ผสานอาการ อธิบายด้วย Grad-CAM และรายงานไทย — เครื่องมือสนับสนุนการตัดสินใจ ไม่ใช่การวินิจฉัยแทนทันตแพทย์" : "Two input types: panoramic X-ray (4 diseases) and live color phone photos (caries / gingivitis / calculus + healthy). Grad-CAM explainability, Thai report — decision-support, not a diagnosis."}</p>
+      <p>${T ? "รองรับ 2 แบบภาพ: X-ray พาโนรามิก (4 โรค) และภาพถ่ายฟันสีจากมือถือสำหรับฟันผุ เหงือกอักเสบ และหินปูน ผสานข้อมูลอาการ อธิบายด้วย CAM และรายงานไทย — เครื่องมือคัดกรองเบื้องต้น ไม่ใช่การวินิจฉัยแทนทันตแพทย์" : "Two input types: panoramic X-rays and live color phone photos for preliminary screening. The system combines symptoms, CAM attribution, and a readable report; it does not replace a dentist."}</p>
       <div class="ah-stats">
         <div><b>2</b><span>${T ? "โหมดภาพ (X-ray+ถ่ายสด)" : "input modes"}</span></div>
         <div><b>0.97</b><span>${T ? "AUC เฉลี่ยภาพถ่าย (test)" : "photo mean AUC (test)"}</span></div>
@@ -249,7 +249,7 @@ function renderAbout() {
     <div class="about-grid">
       ${card("", `<h3>📊 ${T ? "ผลแบบจำลอง — ภาพถ่ายฟัน (AUC ต่อโรค, ชุด test)" : "Photo model — per-disease AUC (TEST set)"}</h3>
         <div class="metric-list">${metricRows}</div>
-        <p class="about-note">${T ? "ชุด test ~1,000 ภาพ (โมเดลไม่เคยเห็น) · mean AUC 0.978 · เสริมภาพผุด้านหน้า (Kaggle close-up) → ผุหน้าที่เคยพลาดตอนนี้ตรวจเจอ · caries threshold 0.40 (เน้น recall) · heatmap (HiResCAM@conv_head) ชี้ตรงกล่องผุ 88% · Grad-CAM เหงือก→ขอบเหงือก, หินปูน→คอฟัน (verify) · X-ray track: val AUC ~0.72" : "~1,000 held-out images · mean AUC 0.978 · added frontal caries close-ups → previously-missed anterior caries now detected · caries threshold 0.40 (recall-favoured) · caries heatmap hit 88% · Grad-CAM verified on gums/cervical · X-ray val AUC ~0.72"}</p>`)}
+        <p class="about-note">${T ? "โมเดลภาพถ่ายเดิมรายงาน mean AUC 0.9786 บนชุดทดสอบภายใน · รุ่นเว็บใช้ ONNX Runtime และ CAM เพื่อลดหน่วยความจำ · ต้องประเมินความแม่นยำเชิงตำแหน่งของ CAM และทดสอบภายนอกเพิ่มเติม · ค่าอ้างอิง X-ray 0.7229 มาจาก config ที่เปิด TTA จึงไม่ใช่ผลยืนยันของ runtime แบบประหยัดทรัพยากรนี้" : "The photo model reported internal-test mean AUC 0.9786. The web runtime uses ONNX Runtime and CAM to reduce memory. CAM localization and external performance still require validation. The X-ray reference value 0.7229 came from a TTA-enabled configuration and is not a validated metric for this resource-saving runtime."}</p>`)}
       ${card("", `<h3>🗂️ ${T ? "ชุดข้อมูล (ภาพถ่าย = 2 แหล่งรวมกัน)" : "Datasets"}</h3>
         <p><b>${T ? "ภาพถ่ายฟัน:" : "Photos:"}</b> ${T ? "Zenodo (ฟันผุ+ปกติ, CC BY 4.0) + Kaggle salmansajid05 (เหงือกอักเสบ/หินปูน) รวม ~10,000 ภาพ multi-label 3 โรค+ปกติ" : "Zenodo (caries+healthy, CC BY 4.0) + Kaggle salmansajid05 (gingivitis/calculus) — ~10,000 images, multi-label"}</p>
         <p><b>X-ray:</b> ${T ? "DENTEX 2023 (MICCAI) — พาโนรามิก 1,005 ภาพ" : "DENTEX 2023 — 1,005 panoramic X-rays"} <span class="about-note" style="border:0;padding:0;margin:0">CC BY-NC-SA</span></p>
@@ -269,7 +269,7 @@ function renderAbout() {
 
     <div class="about-grid">
       ${card("", `<h3>🛠️ ${T ? "เทคโนโลยีที่ใช้" : "Tech stack"}</h3><div class="tech-tags">${TECH.map(t => `<span class="tech-tag">${t}</span>`).join("")}</div>`)}
-      ${card("", `<h3>⚖️ ${T ? "จริยธรรม & ข้อจำกัด" : "Ethics & limits"}</h3><ul class="about-ul"><li>${T ? "เป็นเครื่องมือสนับสนุนการตัดสินใจ ไม่ใช่การวินิจฉัยทางการแพทย์" : "Decision-support, not a diagnosis"}</li><li>${T ? "ผลทุกครั้งต้องให้ทันตแพทย์ยืนยันด้วยการตรวจจริง" : "Always confirm with a dentist"}</li><li>${T ? "ความไว 77% — อาจพลาดฟันผุระยะเริ่ม/ในซอก (แนะนำถ่ายหลายมุม) · heatmap ชี้ตำแหน่งแม่น 96.5% แต่ยังเป็นตัวช่วย ไม่แทนการตรวจจริง" : "Sensitivity 77% — may miss early/interproximal caries (use multiple angles) · heatmap localizes at 96.5% but still assistive, not a diagnosis"}</li></ul>`)}
+      ${card("", `<h3>⚖️ ${T ? "จริยธรรม & ข้อจำกัด" : "Ethics & limits"}</h3><ul class="about-ul"><li>${T ? "เป็นเครื่องมือคัดกรองเบื้องต้น ไม่ใช่การวินิจฉัยทางการแพทย์" : "Preliminary screening support, not a diagnosis"}</li><li>${T ? "ผลทุกครั้งต้องให้ทันตแพทย์ยืนยันด้วยการตรวจจริง" : "Always confirm results with a dentist"}</li><li>${T ? "อาจพลาดรอยโรคระยะแรก รอยโรคในซอกฟัน หรือภาพที่แสงและมุมไม่เหมาะสม · CAM แสดงบริเวณที่มีอิทธิพลต่อคะแนน ไม่ใช่ขอบเขตรอยโรค" : "The model may miss early or interproximal disease and poor-quality views. CAM shows regions influencing a score; it is not a lesion boundary."}</li></ul>`)}
     </div>
 
     ${card("wide team", `<h3>👥 ${T ? "คณะผู้จัดทำ" : "Team"}</h3><div class="team-grid">
@@ -359,7 +359,7 @@ function getSymptoms() {
 
 const PROC_STEPS = [
   "โหลดภาพ X-ray", "ปรับคุณภาพภาพ (preprocess)", "ตรวจหาโรคด้วย AI (EfficientNet)",
-  "สร้าง heatmap (Grad-CAM)", "รวมข้อมูลอาการ (fusion)", "สร้างรายงาน"
+  "สร้าง heatmap (CAM)", "รวมข้อมูลอาการ (fusion)", "สร้างรายงาน"
 ];
 
 async function runAnalysis() {
@@ -399,7 +399,7 @@ async function runAnalysis() {
   }
 }
 
-// fade Grad-CAM overlay opacity (heatmap toolbar slider)
+// Fade the model-attribution overlay opacity.
 window.setHeatmapOpacity = v =>
   document.querySelectorAll(".hm-over").forEach(o => o.style.opacity = v / 100);
 
@@ -431,7 +431,7 @@ function renderResult(data) {
   if (heatmaps.length) {
     heatmapHtml = `
     <div class="heatmap-section">
-      <h2 class="section-title"><span class="eyebrow">EXPLAINABLE AI</span> ${lang==="th"?"ตำแหน่งที่ AI สนใจ · Grad-CAM":"AI Attention · Grad-CAM"}</h2>
+      <h2 class="section-title"><span class="eyebrow">EXPLAINABLE AI</span> ${lang==="th"?"บริเวณที่มีอิทธิพลต่อ AI · CAM":"Model Attribution · CAM"}</h2>
       <div class="heatmap-toolbar">
         <div class="hm-legend"><span>${lang==="th"?"ต่ำ":"LOW"}</span><span class="hm-scale"></span><span>${lang==="th"?"สูง":"HIGH"}</span>&nbsp;·&nbsp;${lang==="th"?"ความสนใจ AI":"AI ATTENTION"}</div>
         <label class="hm-slider">${lang==="th"?"ความเข้ม overlay":"Overlay"}
@@ -442,7 +442,7 @@ function renderResult(data) {
           return `<div class="heatmap-item">
             <div class="hm-canvas">
               <img class="hm-base" src="${scanImg || data.heatmaps[d]}" alt="scan">
-              <img class="hm-over" src="${data.heatmaps[d]}" style="opacity:.7" alt="Grad-CAM ${d}">
+              <img class="hm-over" src="${data.heatmaps[d]}" style="opacity:.7" alt="CAM ${d}">
             </div>
             <div class="hm-cap" style="border-left:4px solid ${m.color}">${m.ico} ${lang==="th"?m.th:d}<span class="hm-pct">${(preds[d]*100).toFixed(0)}%</span></div>
           </div>`;

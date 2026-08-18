@@ -34,6 +34,9 @@ Thumbs.db
 !models/**/metrics.json
 !models/serving_config.json
 !models/**/training_curve.png
+!models/onnx/
+!models/onnx/*.onnx
+!models/onnx/*.json
 
 # Secrets — API keys (DO NOT commit)
 .env

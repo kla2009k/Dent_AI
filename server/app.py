@@ -10,6 +10,7 @@ Endpoints:
 """
 import io
 import base64
+import os
 import pathlib
 from contextlib import asynccontextmanager
 
@@ -20,8 +21,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 from PIL import Image
 
-import predictor
-import predictor_intraoral
+if os.environ.get("INFERENCE_BACKEND", "pytorch").lower() == "onnx":
+    import predictor_onnx as predictor
+    import predictor_intraoral_onnx as predictor_intraoral
+else:
+    import predictor
+    import predictor_intraoral
 import llm_report
 
 ROOT = pathlib.Path(__file__).parent.parent

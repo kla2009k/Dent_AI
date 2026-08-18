@@ -1,0 +1,13 @@
+{
+  "backbone": "efficientnet_b0",
+  "diseases": [
+    "Caries",
+    "Gingivitis",
+    "Calculus"
+  ],
+  "width": 384,
+  "height": 384,
+  "val_mean_auc": 0.9786,
+  "target_layer": "conv_head",
+  "attribution_method": "class_activation_mapping"
+}

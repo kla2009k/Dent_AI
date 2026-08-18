@@ -11,15 +11,5 @@ services:
     healthCheckPath: /api/health
     autoDeployTrigger: checksPass
     envVars:
-      - key: HF_MODEL_REPO_ID
-        value: NemophilaNah/DentScan-AI-Model
-      - key: HF_MODEL_FILENAME
-        value: best_model.pth
-      - key: HF_REVISION
-        value: e3c2db536a2f24b7bd8440ecf90760ad34e1f6da
-      - key: ENABLE_HEATMAP
-        value: "false"
-      - key: ENABLE_TTA
-        value: "false"
-      - key: HF_TOKEN
-        sync: false
+      - key: INFERENCE_BACKEND
+        value: onnx
