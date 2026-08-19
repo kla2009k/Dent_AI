@@ -40,6 +40,11 @@ def test_production_image_uses_onnx_without_pytorch():
     assert "INFERENCE_BACKEND=onnx" in dockerfile
     assert "torch" not in dockerfile.lower()
     assert "onnxruntime" in requirements
+    assert "google-genai" in requirements
     assert "timm" not in requirements
     assert "plan: free" in blueprint
     assert "ENABLE_HEATMAP" not in blueprint
+    assert "LLM_PROVIDER" in blueprint
+    assert "GEMINI_MODEL" in blueprint
+    assert "GEMINI_API_KEY" in blueprint
+    assert "sync: false" in blueprint

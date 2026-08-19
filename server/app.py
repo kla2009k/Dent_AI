@@ -76,6 +76,7 @@ class PredictRequest(BaseModel):
 def health():
     predictor.load_model()
     return {"status": "ok",
+            "llm": llm_report.status(),
             "xray": {"model": predictor._model_info,
                      "diseases": predictor.DISEASES,
                      "diseases_th": predictor.DISEASES_TH},

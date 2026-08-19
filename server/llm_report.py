@@ -1,9 +1,9 @@
 """
-Phase 3 — LLM bilingual report generation (Claude API)
+Phase 3 — LLM bilingual report generation (Gemini API with safe fallback)
 สร้างรายงานทันตกรรมภาษาไทย 2 ระดับ (คนทั่วไป + ทันตแพทย์) จากผล AI + อาการ
 
-- ใช้ Anthropic SDK (claude-opus-4-8) + structured output (messages.parse)
-- ถ้าไม่มี ANTHROPIC_API_KEY จริง → fallback rule-based (โปรเจกต์ทำงานได้เสมอ)
+- ใช้ Google Gen AI SDK (Gemini 2.5 Flash) สำหรับ report และ chat
+- ถ้าไม่มี GEMINI_API_KEY หรือ API ใช้งานไม่ได้ → fallback rule-based
 - decision-support เท่านั้น — system prompt กำกับให้ไม่วินิจฉัยเด็ดขาด/ไม่ alarmist
 """
 import os
@@ -88,6 +88,13 @@ def _provider() -> Optional[str]:
     if _claude_key() and _HAS_PYDANTIC:
         return "claude"
     return None
+
+
+def status() -> dict:
+    """Return public LLM readiness metadata without exposing credentials."""
+    provider = _provider()
+    model = GEMINI_MODEL if provider == "gemini" else MODEL if provider == "claude" else None
+    return {"configured": provider is not None, "provider": provider, "model": model}
 
 
 def _get_gemini():
@@ -238,6 +245,8 @@ CHAT_SYSTEM = (
     "เช่น อาการปวดฟัน ฟันผุ ฟันคุด เหงือก การดูแลฟัน การแปรงฟัน อาหาร และการเตรียมตัวก่อนพบทันตแพทย์ "
     "ตอบเป็นภาษาไทย กระชับ อบอุ่น เข้าใจง่าย ใช้ bullet ได้ถ้าช่วยให้อ่านง่าย ความยาวพอเหมาะ (ไม่ยาวเกินไป) "
     "ถ้ามีบริบทผลการคัดกรองให้ใช้ประกอบ แต่ถ้าผู้ใช้ถามทั่วไปก็ตอบความรู้ทันตกรรมทั่วไปได้เลย "
+    "ค่าร้อยละจากโมเดลคือความน่าจะเป็นของการจำแนก ไม่ใช่ระดับความรุนแรงของโรค "
+    "ห้ามใช้ค่าร้อยละสรุปว่าโรครุนแรง ลึก หรือมากน้อยเพียงใด "
     "ย้ำเมื่อเหมาะสมว่าเป็นคำแนะนำเบื้องต้น ไม่ใช่การวินิจฉัย ควรพบทันตแพทย์เพื่อตรวจจริง "
     "ห้ามสั่งยาเฉพาะเจาะจงหรือยืนยันการรักษาแทนทันตแพทย์ "
     "ถ้าถามนอกเรื่องสุขภาพช่องปากโดยสิ้นเชิง ให้ดึงกลับเข้าเรื่องฟันอย่างสุภาพ"
